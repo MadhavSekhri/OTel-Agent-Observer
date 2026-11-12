@@ -1,6 +1,10 @@
 import unittest
 import asyncio
-from otel_agent_observer.observer import AgentObserver, redact
+from io import StringIO
+from otel_agent_observer.observer import (
+    AgentObserver, redact, jsonl_sink, sanitize_attributes,
+    MAX_ATTRIBUTE_COUNT, MAX_ATTRIBUTE_STRING,
+)
 
 
 class ObserverTests(unittest.TestCase):
@@ -84,6 +88,59 @@ class ObserverTests(unittest.TestCase):
         self.assertFalse(opts["set_status_on_exception"])
         self.assertNotIn("secret", str(events))
         self.assertIn(("agent.exception_type", "ValueError"), settings)
+
+    def test_sink_failure_does_not_replace_application_error(self):
+        def broken_sink(event):
+            raise RuntimeError("sink failure contains private data")
+        observer = AgentObserver(broken_sink, enable_otel=False)
+        with observer.span("normal"):
+            pass
+        with self.assertRaisesRegex(ValueError, "original business error"):
+            with observer.span("error"):
+                raise ValueError("original business error")
+
+    def test_unknown_attributes_are_denied(self):
+        safe = sanitize_attributes({
+            "session_identity": "an@example.com",
+            "model": "local-model",
+            "request_payload": {"password": "hidden"},
+        })
+        self.assertEqual(safe["session_identity"], "[REDACTED]")
+        self.assertEqual(safe["request_payload"], "[REDACTED]")
+        self.assertEqual(safe["model"], "local-model")
+
+    def test_redact_budgets_and_nonfinite_values(self):
+        value = redact({"nested": {"float": float("nan"), "items": ["x" * 700]}})
+        self.assertEqual(value["nested"]["float"], "[REDACTED]")
+        self.assertEqual(len(value["nested"]["items"][0]), MAX_ATTRIBUTE_STRING)
+        self.assertEqual(redact({"input_tokens": -1})["input_tokens"], "[REDACTED]")
+        self.assertEqual(redact({"input_tokens": 10})["input_tokens"], 10)
+        self.assertEqual(len(sanitize_attributes({
+            f"attr_{i}": str(i) for i in range(MAX_ATTRIBUTE_COUNT + 10)
+        })), MAX_ATTRIBUTE_COUNT)
+        stream = StringIO()
+        sink = jsonl_sink(stream)
+        sink({"attrs": {"input_tokens": 10}})
+        self.assertIn('"input_tokens": 10', stream.getvalue())
+
+    def test_exporter_failure_is_ignored(self):
+        events = []
+        class FakeSpan:
+            def set_attribute(self, *_):
+                raise RuntimeError("tracer failure")
+        class Scope:
+            def __enter__(self):
+                return FakeSpan()
+            def __exit__(self, *_):
+                raise RuntimeError("exit failure")
+        class Tracer:
+            def start_as_current_span(self, *_args, **_kwargs):
+                return Scope()
+        observer = AgentObserver(events.append, enable_otel=False)
+        observer._tracer = Tracer()
+        with observer.span("still-works", {"model": "test"}):
+            pass
+        self.assertEqual(events[0]["status"], "ok")
 
     def test_failure_event_and_raise(self):
         events = []

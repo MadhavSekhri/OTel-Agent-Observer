@@ -34,7 +34,7 @@ For OpenTelemetry exporters, install and configure the OpenTelemetry SDK in the 
 
 Or run `otel-agent-demo` to emit a simulated JSONL event.
 
-The observer does not record prompts or responses by default. It redacts common credential, prompt, message, request, and response keys plus some token-like substrings. These heuristics **do not guarantee privacy**. An application must configure a trustworthy sink/exporter. Without an installed OpenTelemetry SDK/exporter, traces are not exported.
+The observer does not record prompts or responses by default. It uses an explicit set of safe attribute names (for example model, provider, operation and numeric token counts). Unknown attribute keys are redacted by default. String values and metadata counts are bounded. This is intentionally not a complete PII/DLP solution. These heuristics **do not guarantee privacy**. An application must configure a trustworthy sink/exporter. Without an installed OpenTelemetry SDK/exporter, traces are not exported.
 
 ## Tests
 
@@ -47,3 +47,7 @@ See CONTRIBUTING.md and SECURITY.md. Apache OpenTelemetry is a separate upstream
 ## License
 
 MIT; see LICENSE.
+
+## Architecture and security
+
+This is an actively developed prototype, not a certification or completed production service. Review the [product design and acceptance gates](docs/PRODUCT_PLAN.md), [threat model](docs/THREAT_MODEL.md), and [implementation contract](docs/TELEMETRY_POLICY.md) before depending on it. Changes are proposed through draft pull requests with automated tests and security-focused code review.
