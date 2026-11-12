@@ -34,7 +34,7 @@ For OpenTelemetry exporters, install and configure the OpenTelemetry SDK in the 
 
 Or run `otel-agent-demo` to emit a simulated JSONL event.
 
-The observer does not record prompts or responses by default. It redacts common credential, prompt, message, request, and response keys plus some token-like substrings. These heuristics **do not guarantee privacy**. An application must configure a trustworthy sink/exporter. Without an installed OpenTelemetry SDK/exporter, traces are not exported.
+The observer does not record prompts or responses by default. It uses an explicit set of safe attribute names (for example model, provider, operation and numeric token counts). Unknown attribute keys are redacted by default. String values and metadata counts are bounded. This is intentionally not a complete PII/DLP solution. These heuristics **do not guarantee privacy**. An application must configure a trustworthy sink/exporter. Without an installed OpenTelemetry SDK/exporter, traces are not exported.
 
 ## Tests
 
