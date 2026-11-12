@@ -20,9 +20,21 @@ with observer.span("llm.request", {"model": "local-demo", "api_key": "private"})
     pass
 ```
 
+To instrument regular or asynchronous functions without capturing their inputs:
+
+```python
+observer = AgentObserver(sink=print, enable_otel=False)
+
+@observer.traced("calculate")
+def calculate(x):
+    return x * 2
+```
+
+For OpenTelemetry exporters, install and configure the OpenTelemetry SDK in the application. The observer uses an active span context when available. **By default it does not auto-record exception messages or stack traces**; it only records exception class names. Avoid attaching sensitive information to custom span attributes.
+
 Or run `otel-agent-demo` to emit a simulated JSONL event.
 
-The observer does not record prompts or responses by default. It redacts keys matching common credential names and token-like substrings. These heuristics **do not guarantee privacy**. An application must configure a trustworthy sink/exporter. Without an installed OpenTelemetry SDK/exporter, traces are not exported.
+The observer does not record prompts or responses by default. It redacts common credential, prompt, message, request, and response keys plus some token-like substrings. These heuristics **do not guarantee privacy**. An application must configure a trustworthy sink/exporter. Without an installed OpenTelemetry SDK/exporter, traces are not exported.
 
 ## Tests
 
