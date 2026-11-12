@@ -1,6 +1,5 @@
 import unittest
 import asyncio
-import math
 from io import StringIO
 from otel_agent_observer.observer import (
     AgentObserver, redact, jsonl_sink, sanitize_attributes,
