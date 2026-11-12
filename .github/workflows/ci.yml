@@ -23,3 +23,5 @@ jobs:
           ruff check --select E4,E7,E9,F src tests
       - name: Verify installed dependencies
         run: python -m pip check
+      - name: Run the documented trace example
+        run: python examples/agent_trace.py
