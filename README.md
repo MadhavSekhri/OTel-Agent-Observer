@@ -51,6 +51,10 @@ nested context propagation, sync/async behavior and absence of exception text.
 The library does not configure an OTLP endpoint or send any data itself.
 See [SDK guide](docs/OTEL_SDK_INTEGRATION.md).
 
+Run the [synthetic parent/child trace example](examples/agent_trace.py) after installing the SDK extra:
+
+    python examples/agent_trace.py
+
 ## Tests
 
     python -m unittest discover -s tests -v
