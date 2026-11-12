@@ -47,3 +47,7 @@ See CONTRIBUTING.md and SECURITY.md. Apache OpenTelemetry is a separate upstream
 ## License
 
 MIT; see LICENSE.
+
+## Architecture and security
+
+This is an actively developed prototype, not a certification or completed production service. Review the [product design and acceptance gates](docs/PRODUCT_PLAN.md), [threat model](docs/THREAT_MODEL.md), and [implementation contract](docs/TELEMETRY_POLICY.md) before depending on it. Changes are proposed through draft pull requests with automated tests and security-focused code review.
