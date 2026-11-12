@@ -162,6 +162,21 @@ class AgentObserver:
                 # their sinks to monitor exporter delivery failures separately.
                 pass
 
+    def genai_span(self, *, operation, model, provider, input_tokens=None,
+                   output_tokens=None):
+        """Start an opt-in metadata-only GenAI operation span.
+
+        Returns a context manager. Usage counts are caller-supplied; this
+        instrumentation never reads prompts or model API responses.
+        """
+        from .genai import genai_attributes
+
+        attributes = genai_attributes(
+            operation=operation, model=model, provider=provider,
+            input_tokens=input_tokens, output_tokens=output_tokens,
+        )
+        return self.span("gen_ai." + operation, attributes)
+
     def traced(self, name: str, attributes: dict | None = None):
         """Wrap a synchronous or asynchronous function without capturing its arguments."""
         def decorate(func):

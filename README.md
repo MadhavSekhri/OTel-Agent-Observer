@@ -36,6 +36,21 @@ Or run `otel-agent-demo` to emit a simulated JSONL event.
 
 The observer does not record prompts or responses by default. It uses an explicit set of safe attribute names (for example model, provider, operation and numeric token counts). Unknown attribute keys are redacted by default. String values and metadata counts are bounded. This is intentionally not a complete PII/DLP solution. These heuristics **do not guarantee privacy**. An application must configure a trustworthy sink/exporter. Without an installed OpenTelemetry SDK/exporter, traces are not exported.
 
+## Real OpenTelemetry SDK integration (P1)
+
+Install the optional SDK integration for local tests:
+
+    python -m pip install -e '.[otel-test]'
+
+Then configure a TracerProvider and span processor in your application.
+Call observer.genai_span(operation='chat', model='local', provider='test',
+input_tokens=12, output_tokens=8) to record opt-in metadata only.
+
+Integration tests use a real OpenTelemetry in-memory exporter and assert
+nested context propagation, sync/async behavior and absence of exception text.
+The library does not configure an OTLP endpoint or send any data itself.
+See [SDK guide](docs/OTEL_SDK_INTEGRATION.md).
+
 ## Tests
 
     python -m unittest discover -s tests -v
