@@ -3,7 +3,8 @@ import asyncio
 import unittest
 
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import InMemorySpanExporter, SimpleSpanProcessor
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
 from otel_agent_observer.genai import genai_attributes
 from otel_agent_observer.observer import AgentObserver
