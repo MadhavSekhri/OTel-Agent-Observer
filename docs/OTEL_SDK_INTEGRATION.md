@@ -11,7 +11,8 @@ Example with the real SDK:
 
     from opentelemetry import trace
     from opentelemetry.sdk.trace import TracerProvider
-    from opentelemetry.sdk.trace.export import SimpleSpanProcessor, InMemorySpanExporter
+    from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+    from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
     from otel_agent_observer.observer import AgentObserver
     provider = TracerProvider()
     exporter = InMemorySpanExporter()
