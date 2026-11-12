@@ -21,3 +21,7 @@ otel-agent-demo = "otel_agent_observer.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[project.urls]
+Repository = "https://github.com/MadhavSekhri/OTel-Agent-Observer"
+Issues = "https://github.com/MadhavSekhri/OTel-Agent-Observer/issues"
