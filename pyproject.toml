@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "otel-agent-observer"
+version = "0.1.0"
+description = "Emit redacted AI agent step events with optional OpenTelemetry API spans"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Open-source contributors"}]
+dependencies = []
+
+[project.optional-dependencies]
+otel = ["opentelemetry-api>=1.20"]
+
+[project.scripts]
+otel-agent-demo = "otel_agent_observer.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
